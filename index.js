@@ -19,11 +19,11 @@ const players = {};
 io.on('connection', (socket) => {
   console.log(`A user ${socket.id} connected.`);
 
-//   socket.on('room-created', () => {
-//     const roomId = uuidv4(); // Generate a unique room ID using the uuid package
-//     rooms.set(roomId, new Set([socket.id])); // Add the room ID to the map of rooms and add the first player to the set of players in the room
-//     socket.emit('room-created', { roomId });
-//   });
+    socket.on("send_message", (data) => {
+      socket.broadcast.emit("receive_message", data)
+    });
+
+    socket.emit('message', 'Hello from server!');
 
   // Handle the "join room" request
     socket.on('join-room', (data) => {
@@ -64,7 +64,7 @@ io.on('connection', (socket) => {
                   rooms.delete(roomUuid);
                   console.log(`Room ${roomUuid} deleted due to timeout`);
                 });
-              }, 60000);
+              }, 1000000);
             //timeouts.set(roomUuid, timeoutId);
           }
           
@@ -96,46 +96,8 @@ io.on('connection', (socket) => {
         
       }
     });
-    // db.all('SELECT * FROM questions ORDER BY RANDOM() LIMIT 10', (err, rows) => {
-    //     if (err) {
-    //       console.error(err.message);
-    //       return;
-    //     }
-  
-    //     socket.emit('startQuiz', rows);
-    //   });
   });
 
-  socket.emit('message', 'Hello from server!');
-
-  // Handle the "end quiz" request
-// socket.on('end-quiz', (data) => {
-//     const roomUuid = data.roomUuid;
-  
-//     // Delete the room from the database
-//     db.run('DELETE FROM rooms WHERE uuid = ?', [roomUuid], (err) => {
-//       if (err) {
-//         console.error(err);
-//         return;
-//       }
-//       console.log(`Room ${roomUuid} deleted after quiz ended`);
-//     });
-//   });
-
-//   socket.on('disconnecting', () => {
-//     // Remove the socket from any rooms it was in
-//     for (const roomId of socket.rooms) {
-//       if (rooms.has(roomId)) {
-//         const room = rooms.get(roomId);
-//         room.delete(socket.id);
-//         if (room.size === 0) { // Remove the room if there are no players in it
-//           rooms.delete(roomId);
-//         } else { // Send a player-disconnected event to the other socket in the room
-//           socket.to(roomId).emit('player-disconnected', { playerId: socket.id });
-//         }
-//       }
-//     }
-//   });
 
   socket.on('disconnect', () => {
     console.log('A user disconnected.');
