@@ -21,8 +21,8 @@ io.on("connection", (socket) => {
   let roomId;
   let userCount;
   // let user;
-  // let user1;
-  // let user2;
+  let user1;
+  let user2;
 
   // socket.on("score", (data) => {
   //   console.log(data["user1"]);
@@ -72,13 +72,16 @@ io.on("connection", (socket) => {
               }
             }
           );
-          console.log(`User ${socket.id} joined room ${roomUuid}`);
+          user2 = socket.id;
+          console.log(`User2 ${user2} joined room ${roomUuid}`);
           socket.emit("room-joined", { roomId, roomUuid });
           console.log(`User count: ${userCount}`);
           socket.emit("userCount", userCount);
           socket.on("answered", (data) => {
             console.log(`Client ${socket.id} answered the question`);
-            console.log(`Data ${data["userAnswer"]} answered the question`);
+            //console.log(`Data ${data["userAnswer"]} answered the question`);
+            data.socketId = socket.id;
+            data.user = "user2";
 
             //data["user"] = false;
 
@@ -127,8 +130,9 @@ io.on("connection", (socket) => {
                     return;
                   }
                   rooms.set(roomUuid, [socket]);
+                  user1 = socket.id;
                   console.log(
-                    `User ${socket.id} created and joined room ${roomUuid}`
+                    `User1 ${user1} created and joined room ${roomUuid}`
                   );
                   console.log(`User count: ${userCount}`);
                   socket.emit("room-joined", { roomId, roomUuid });
@@ -140,8 +144,10 @@ io.on("connection", (socket) => {
           );
           socket.on("answered", (data) => {
             console.log(`Client ${socket.id} answered the question`);
-            console.log(`Data ${data["userAnswer"]} answered the question`);
+            //console.log(`Data ${data["userAnswer"]} answered the question`);
 
+            data.socketId = socket.id;
+            data.user = "user1";
             //data["user"] = true;
             // Broadcast the "answered" event to all connected clients except the sender
             io.to(newUuid).emit("answered", data);
